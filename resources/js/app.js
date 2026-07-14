@@ -1,0 +1,91 @@
+import './bootstrap';
+
+// Bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
+import * as bootstrap from 'bootstrap';
+
+window.bootstrap = bootstrap;
+
+// Auto close alerts after 3 seconds
+document.addEventListener('DOMContentLoaded', () => {
+
+    const alerts = document.querySelectorAll('.alert');
+
+    alerts.forEach((alert) => {
+
+        setTimeout(() => {
+
+            alert.classList.add('fade');
+
+            setTimeout(() => {
+
+                alert.remove();
+
+            }, 300);
+
+        }, 3000);
+
+    });
+
+});
+
+// Confirm logout
+document.addEventListener('DOMContentLoaded', () => {
+
+    const logoutForm = document.querySelector('.logout-form');
+
+    if (logoutForm) {
+
+        logoutForm.addEventListener('submit', function (e) {
+
+            const confirmLogout = confirm('Are you sure you want to logout?');
+
+            if (!confirmLogout) {
+                e.preventDefault();
+            }
+
+        });
+
+    }
+
+});
+
+// Sidebar active effect
+document.addEventListener('DOMContentLoaded', () => {
+
+    const menuLinks = document.querySelectorAll('.menu li a');
+
+    menuLinks.forEach(link => {
+
+        link.addEventListener('click', () => {
+
+            menuLinks.forEach(item => {
+                item.parentElement.classList.remove('active');
+            });
+
+            link.parentElement.classList.add('active');
+
+        });
+
+    });
+
+});
+
+// Simple card hover animation
+document.addEventListener('DOMContentLoaded', () => {
+
+    const cards = document.querySelectorAll('.card-box');
+
+    cards.forEach(card => {
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+
+    });
+
+});

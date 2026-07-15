@@ -12,11 +12,12 @@ class Inventory extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [
-        'item_name',
-        'category',
-        'quantity',
-        'unit',
-        'minimum_stock',
-    ];
+   protected $fillable = [
+
+    'item_name',
+    'item_type',
+    'quantity',
+    'minimum_stock',
+
+];
 }

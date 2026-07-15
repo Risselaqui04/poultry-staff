@@ -8,38 +8,46 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $today = today();
+   public function index()
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Latest Production Date
+    |--------------------------------------------------------------------------
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Today's Production
-        |--------------------------------------------------------------------------
-        */
+    $latestDate = Production::max('production_date');
 
-        $todayProduction = Production::whereDate('production_date', today())
-            ->sum('eggs_produced');
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Cards
+    |--------------------------------------------------------------------------
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Summary Cards
-        |--------------------------------------------------------------------------
-        */
+    // Total Eggs Today
+    $todayProduction = Production::whereDate('production_date', $latestDate)
+        ->sum('eggs_produced');
 
-        $totalEggs = Production::sum('eggs_produced');
+    // Active Batches
+    $activeBatches = Production::whereDate('production_date', $latestDate)
+        ->distinct('batch_id')
+        ->count('batch_id');
 
-        $feeds = Inventory::where('item_name', 'Feeds')->value('quantity');
+    // Feeds Available
+    $feeds = Inventory::where('item_type', 'Feed')
+        ->sum('quantity');
 
-        $eggTrays = Inventory::where('item_name', 'Egg Trays')->value('quantity');
+    // Egg Trays Available
+    $eggTrays = Inventory::where('item_type', 'Egg Tray')
+        ->sum('quantity');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Weekly Production Chart
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | Weekly Production Chart
+    |--------------------------------------------------------------------------
+    */
 
-        $weeklyProduction = Production::selectRaw("
+    $weeklyProduction = Production::selectRaw("
         DATE(production_date) as production_date,
         SUM(eggs_produced) as total
     ")
@@ -51,12 +59,12 @@ class DashboardController extends Controller
     ->orderBy('production_date')
     ->get();
 
-        return view('dashboardview', compact(
-            'todayProduction',
-            'totalEggs',
-            'feeds',
-            'eggTrays',
-            'weeklyProduction'
-        ));
-    }
+    return view('dashboardview', compact(
+        'todayProduction',
+        'activeBatches',
+        'feeds',
+        'eggTrays',
+        'weeklyProduction'
+    ));
+}
 }

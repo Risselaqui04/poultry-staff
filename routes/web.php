@@ -110,6 +110,32 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
 
+     Route::post('/inventory/update', [InventoryController::class, 'update'])
+        ->name('inventory.update');
+
+     Route::post('/inventory/update/{id}', [InventoryController::class, 'updateStock'])
+        ->name('inventory.update');
+
+        // Inventory
+    Route::post('/inventory/store', [InventoryController::class, 'store'])
+        ->name('inventory.store');
+
+    Route::post('/inventory/update/{id}', [InventoryController::class, 'update'])
+        ->name('inventory.update');
+
+    Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
+        ->name('inventory.delete');
+
+        Route::post('/inventory/store', [InventoryController::class, 'store'])
+    ->name('inventory.store');
+
+Route::post('/inventory/update/{id}', [InventoryController::class, 'update'])
+    ->name('inventory.update');
+
+Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
+    ->name('inventory.destroy');
+    
+
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');

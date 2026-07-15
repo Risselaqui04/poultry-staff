@@ -1,224 +1,188 @@
 @extends('layouts.dashboard')
 
-@section('title','Dashboard')
+@section('title', 'Dashboard')
 
 @section('content')
 
-<!-- SUMMARY -->
+    <!-- SUMMARY -->
 
-<div class="summary">
+    <div class="summary">
 
-    <div class="dashboard-card-small">
-
-        <div class="card-icon">
-
-            <i class="fas fa-egg"></i>
-
+        <div class="dashboard-card-small">
+            <div class="card-icon">
+                <i class="fas fa-egg"></i>
+            </div>
+            <div>
+                <h5>Total Eggs Today</h5>
+                <h2>{{ number_format($todayProduction) }}</h2>
+                <small>Today's collected eggs</small>
+            </div>
         </div>
 
-        <div>
-
-            <h5>Total Eggs Today</h5>
-
-            <h2>8,130</h2>
-
-            <small>Today's collected eggs</small>
-
+        <div class="dashboard-card-small">
+            <div class="card-icon">
+                <i class="fas fa-dove"></i>
+            </div>
+            <div>
+                <h5>Active Batches</h5>
+                <h2>{{ $activeBatches }}</h2>
+                <small>Currently producing</small>
+            </div>
         </div>
 
-    </div>
-
-    <div class="dashboard-card-small">
-
-        <div class="card-icon">
-
-            <i class="fas fa-dove"></i>
-
+        <div class="dashboard-card-small">
+            <div class="card-icon">
+                <i class="fas fa-wheat-awn"></i>
+            </div>
+            <div>
+                <h5>Feeds Available</h5>
+                <h2>{{ number_format($feeds) }}</h2>
+                <small>Bags remaining</small>
+            </div>
         </div>
 
-        <div>
-
-            <h5>Active Batches</h5>
-
-            <h2>3</h2>
-
-            <small>Currently producing</small>
-
-        </div>
-
-    </div>
-
-    <div class="dashboard-card-small">
-
-        <div class="card-icon">
-
-            <i class="fas fa-wheat-awn"></i>
-
-        </div>
-
-        <div>
-
-            <h5>Feeds Available</h5>
-
-            <h2>190</h2>
-
-            <small>Bags remaining</small>
-
+        <div class="dashboard-card-small">
+            <div class="card-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div>
+                <h5>Egg Trays</h5>
+                <h2>{{ number_format($eggTrays) }}</h2>
+                <small>Available trays</small>
+            </div>
         </div>
 
     </div>
 
-    <div class="dashboard-card-small">
+    <!-- BAR GRAPH -->
 
-        <div class="card-icon">
+    <div class="table-container">
 
-            <i class="fas fa-box"></i>
+        <div class="table-title">
 
-        </div>
-
-        <div>
-
-            <h5>Egg Trays</h5>
-
-            <h2>220</h2>
-
-            <small>Available trays</small>
+            <h2>Weekly Egg Production</h2>
 
         </div>
 
-    </div>
+        <div class="chart-wrapper">
 
-</div>
+            <canvas id="productionChart"></canvas>
 
-<!-- BAR GRAPH -->
+        </div>
 
-<div class="table-container">
+        <div class="graph-description">
 
-    <div class="table-title">
+            <h5>Production Overview</h5>
 
-        <h2>Weekly Egg Production</h2>
+            <p>
 
-    </div>
+                This chart shows the total egg production recorded over the last seven days.
+                It allows the poultry staff and farm manager to quickly monitor daily production,
+                identify trends, and detect sudden increases or decreases in egg output.
 
-    <div class="chart-wrapper">
+            </p>
 
-        <canvas id="productionChart"></canvas>
-
-    </div>
-
-    <div class="graph-description">
-
-        <h5>Production Overview</h5>
-
-        <p>
-
-            This chart shows the total egg production recorded over the last seven days.
-            It allows the poultry staff and farm manager to quickly monitor daily production,
-            identify trends, and detect sudden increases or decreases in egg output.
-
-        </p>
+        </div>
 
     </div>
 
-</div>
+    <!-- QUICK ACCESS -->
 
-<!-- QUICK ACCESS -->
+    <div class="table-container" style="margin-top:25px;">
 
-<div class="table-container" style="margin-top:25px;">
+        <div class="table-title">
 
-    <div class="table-title">
+            <h2>Quick Access</h2>
 
-        <h2>Quick Access</h2>
+        </div>
+
+        <div class="quick-menu">
+
+            <a href="{{ route('production') }}" class="quick-card">
+
+                <i class="fas fa-egg"></i>
+
+                <span>Production</span>
+
+            </a>
+
+            <a href="{{ route('inventory') }}" class="quick-card">
+
+                <i class="fas fa-boxes"></i>
+
+                <span>Inventory</span>
+
+            </a>
+
+
+        </div>
 
     </div>
-
-    <div class="quick-menu">
-
-        <a href="{{ route('production') }}" class="quick-card">
-
-            <i class="fas fa-egg"></i>
-
-            <span>Production</span>
-
-        </a>
-
-        <a href="{{ route('inventory') }}" class="quick-card">
-
-            <i class="fas fa-boxes"></i>
-
-            <span>Inventory</span>
-
-        </a>
-
-
-    </div>
-
-</div>
 
 @endsection
 
 @push('scripts')
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
+    <script>
 
-const ctx = document.getElementById('productionChart');
+        const ctx = document.getElementById('productionChart');
 
-new Chart(ctx,{
+        new Chart(ctx, {
 
-    type:'bar',
+            type: 'bar',
 
-    data:{
+            data: {
 
-        labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 
-        datasets:[{
+                datasets: [{
 
-            label:'Egg Production',
+                    label: 'Egg Production',
 
-            data:[7200,7350,7100,7520,7670,7480,7800],
+                    data: [7200, 7350, 7100, 7520, 7670, 7480, 7800],
 
-            backgroundColor:'#2E7D32',
+                    backgroundColor: '#2E7D32',
 
-            borderRadius:8,
+                    borderRadius: 8,
 
-            borderSkipped:false
+                    borderSkipped: false
 
-        }]
+                }]
 
-    },
+            },
 
-    options:{
+            options: {
 
-        responsive:true,
+                responsive: true,
 
-        maintainAspectRatio:false,
+                maintainAspectRatio: false,
 
-        plugins:{
+                plugins: {
 
-            legend:{
+                    legend: {
 
-                display:false
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true
+
+                    }
+
+                }
 
             }
 
-        },
+        });
 
-        scales:{
-
-            y:{
-
-                beginAtZero:true
-
-            }
-
-        }
-
-    }
-
-});
-
-</script>
+    </script>
 
 @endpush

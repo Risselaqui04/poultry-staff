@@ -6,22 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('qr_transactions', function (Blueprint $table) {
+        Schema::create('daily_inventory_logs', function (Blueprint $table) {
+
             $table->id();
+
+            $table->date('log_date')->unique();
+
             $table->timestamps();
+
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('qr_transactions');
+        Schema::dropIfExists('daily_inventory_logs');
     }
 };

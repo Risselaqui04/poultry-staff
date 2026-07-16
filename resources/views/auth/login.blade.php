@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,658 +9,631 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
+        body {
 
-body{
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+            background: linear-gradient(135deg, #2E7D32, #66BB6A);
 
-    background:linear-gradient(135deg,#2E7D32,#66BB6A);
+            padding: 30px;
 
-    padding:30px;
+        }
 
-}
+        .login-wrapper {
 
-.login-wrapper{
+            width: 1100px;
+            max-width: 100%;
 
-    width:1100px;
-    max-width:100%;
+            background: #fff;
 
-    background:#fff;
+            border-radius: 25px;
 
-    border-radius:25px;
+            overflow: hidden;
 
-    overflow:hidden;
+            display: grid;
 
-    display:grid;
+            grid-template-columns: 1fr 1fr;
 
-    grid-template-columns:1fr 1fr;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
 
-    box-shadow:0 20px 60px rgba(0,0,0,.18);
+        }
 
-}
+        .left-panel {
 
-.left-panel{
+            background: linear-gradient(160deg, #2E7D32, #43A047, #66BB6A);
 
-    background:linear-gradient(160deg,#2E7D32,#43A047,#66BB6A);
+            color: #fff;
 
-    color:#fff;
+            padding: 70px 50px;
 
-    padding:70px 50px;
+            display: flex;
 
-    display:flex;
+            flex-direction: column;
 
-    flex-direction:column;
+            justify-content: center;
 
-    justify-content:center;
+        }
 
-}
+        .left-panel h1 {
 
-.left-panel h1{
+            font-size: 42px;
 
-    font-size:42px;
+            margin-bottom: 10px;
 
-    margin-bottom:10px;
+        }
 
-}
+        .left-panel h2 {
 
-.left-panel h2{
+            font-size: 28px;
 
-    font-size:28px;
+            margin-bottom: 20px;
 
-    margin-bottom:20px;
+            font-weight: 600;
 
-    font-weight:600;
+        }
 
-}
+        .left-panel p {
 
-.left-panel p{
+            line-height: 28px;
 
-    line-height:28px;
+            color: #F1F8E9;
 
-    color:#F1F8E9;
+            margin-bottom: 40px;
 
-    margin-bottom:40px;
+        }
 
-}
+        .feature {
 
-.feature{
+            display: flex;
 
-    display:flex;
+            align-items: center;
 
-    align-items:center;
+            gap: 15px;
 
-    gap:15px;
+            margin-bottom: 18px;
 
-    margin-bottom:18px;
+            font-size: 16px;
 
-    font-size:16px;
+        }
 
-}
+        .feature-icon {
 
-.feature-icon{
+            width: 45px;
 
-    width:45px;
+            height: 45px;
 
-    height:45px;
+            border-radius: 50%;
 
-    border-radius:50%;
+            background: rgba(255, 255, 255, .2);
 
-    background:rgba(255,255,255,.2);
+            display: flex;
 
-    display:flex;
+            justify-content: center;
 
-    justify-content:center;
+            align-items: center;
 
-    align-items:center;
+            font-size: 20px;
 
-    font-size:20px;
+        }
 
-}
+        .right-panel {
 
-.right-panel{
+            padding: 60px;
 
-    padding:60px;
+            background: #fff;
 
-    background:#fff;
+        }
 
-}
+        .logo {
 
-.logo{
+            text-align: center;
 
-    text-align:center;
+            margin-bottom: 10px;
 
-    margin-bottom:10px;
+        }
 
-}
+        .logo span {
 
-.logo span{
+            font-size: 60px;
 
-    font-size:60px;
+        }
 
-}
+        .title {
 
-.title{
+            text-align: center;
 
-    text-align:center;
+            color: #2E7D32;
 
-    color:#2E7D32;
+            font-size: 30px;
 
-    font-size:30px;
+            font-weight: 700;
 
-    font-weight:700;
+        }
 
-}
+        .subtitle {
 
-.subtitle{
+            text-align: center;
 
-    text-align:center;
+            color: #777;
 
-    color:#777;
+            margin-top: 8px;
 
-    margin-top:8px;
+            margin-bottom: 35px;
 
-    margin-bottom:35px;
+        }
 
-}
+        label {
 
-label{
+            display: block;
 
-    display:block;
+            margin-bottom: 8px;
 
-    margin-bottom:8px;
+            font-weight: 600;
 
-    font-weight:600;
+            color: #333;
 
-    color:#333;
+        }
 
-}
+        input[type=text],
+        input[type=password] {
 
-input[type=text],
-input[type=password]{
+            width: 100%;
 
-    width:100%;
+            padding: 14px 16px;
 
-    padding:14px 16px;
+            border: 1px solid #ddd;
 
-    border:1px solid #ddd;
+            border-radius: 10px;
 
-    border-radius:10px;
+            margin-bottom: 20px;
 
-    margin-bottom:20px;
+            transition: .3s;
 
-    transition:.3s;
+            font-size: 15px;
 
-    font-size:15px;
+        }
 
-}
+        input:focus {
 
-input:focus{
+            border-color: #2E7D32;
 
-    border-color:#2E7D32;
+            outline: none;
 
-    outline:none;
+            box-shadow: 0 0 10px rgba(46, 125, 50, .15);
 
-    box-shadow:0 0 10px rgba(46,125,50,.15);
+        }
 
-}
+        .password-container {
 
-.password-container{
+            position: relative;
 
-    position:relative;
+        }
 
-}
+        .password-container input {
 
-.password-container input{
+            padding-right: 50px;
 
-    padding-right:50px;
+        }
 
-}
+        .toggle-password {
 
-.toggle-password{
+            position: absolute;
 
-    position:absolute;
+            right: 15px;
 
-    right:15px;
+            top: 14px;
 
-    top:14px;
+            cursor: pointer;
 
-    cursor:pointer;
+            font-size: 20px;
 
-    font-size:20px;
+        }
 
-}
+        .error-box {
 
-.error-box{
+            background: #FFEBEE;
 
-    background:#FFEBEE;
+            color: #C62828;
 
-    color:#C62828;
+            padding: 12px;
 
-    padding:12px;
+            border-radius: 8px;
 
-    border-radius:8px;
+            text-align: center;
 
-    text-align:center;
+            margin-bottom: 20px;
 
-    margin-bottom:20px;
+        }
 
-}
-.terms{
+        .terms {
 
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    margin:18px 0;
-    font-size:14px;
-    color:#555;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 18px 0;
+            font-size: 14px;
+            color: #555;
 
-}
+        }
 
-.terms input{
+        .terms input {
 
-    margin-top:4px;
+            margin-top: 4px;
 
-}
+        }
 
-.terms a{
+        .terms a {
 
-    color:#2E7D32;
-    text-decoration:none;
-    font-weight:600;
+            color: #2E7D32;
+            text-decoration: none;
+            font-weight: 600;
 
-}
+        }
 
-.terms a:hover{
+        .terms a:hover {
 
-    text-decoration:underline;
+            text-decoration: underline;
 
-}
+        }
 
-.remember-row{
+        .remember-row {
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
 
-}
+        }
 
-.remember{
+        .remember {
 
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
 
-}
+        }
 
-.remember input{
+        .remember input {
 
-    width:16px;
-    height:16px;
+            width: 16px;
+            height: 16px;
 
-}
+        }
 
-.forgot-password{
+        .forgot-password {
 
-    color:#2E7D32;
-    text-decoration:none;
-    font-size:14px;
-    font-weight:600;
+            color: #2E7D32;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
 
-}
+        }
 
-.forgot-password:hover{
+        .forgot-password:hover {
 
-    text-decoration:underline;
+            text-decoration: underline;
 
-}
+        }
 
-.g-recaptcha{
+        .g-recaptcha {
 
-    margin:20px 0;
+            margin: 20px 0;
 
-}
+        }
 
-.login-btn{
+        .login-btn {
 
-    width:100%;
+            width: 100%;
 
-    padding:15px;
+            padding: 15px;
 
-    border:none;
+            border: none;
 
-    border-radius:12px;
+            border-radius: 12px;
 
-    background:linear-gradient(135deg,#2E7D32,#43A047);
+            background: linear-gradient(135deg, #2E7D32, #43A047);
 
-    color:#fff;
+            color: #fff;
 
-    font-size:16px;
+            font-size: 16px;
 
-    font-weight:600;
+            font-weight: 600;
 
-    cursor:pointer;
+            cursor: pointer;
 
-    transition:.3s;
+            transition: .3s;
 
-}
+        }
 
-.login-btn:hover{
+        .login-btn:hover {
 
-    transform:translateY(-2px);
+            transform: translateY(-2px);
 
-    box-shadow:0 12px 25px rgba(46,125,50,.30);
+            box-shadow: 0 12px 25px rgba(46, 125, 50, .30);
 
-}
+        }
 
-.footer{
+        .footer {
 
-    margin-top:30px;
+            margin-top: 30px;
 
-    text-align:center;
+            text-align: center;
 
-    color:#999;
+            color: #999;
 
-    font-size:13px;
+            font-size: 13px;
 
-}
+        }
 
-@media(max-width:992px){
+        @media(max-width:992px) {
 
-.login-wrapper{
+            .login-wrapper {
 
-grid-template-columns:1fr;
+                grid-template-columns: 1fr;
 
-}
+            }
 
-.left-panel{
+            .left-panel {
 
-display:none;
+                display: none;
 
-}
+            }
 
-.right-panel{
+            .right-panel {
 
-padding:40px 30px;
+                padding: 40px 30px;
 
-}
+            }
 
-}
-
-</style>
+        }
+    </style>
 
 </head>
 
 <body>
+    <div class="login-wrapper">
 
-<div class="login-wrapper">
+        <div class="left-panel">
 
-<div class="left-panel">
+            <h1>🐔</h1>
 
-<h1>🐔</h1>
+            <h2>NB Poultry Farm</h2>
 
-<h2>NB Poultry Farm</h2>
+            <p>
 
-<p>
+                Manage egg production, inventory, QR code tracking,
+                dispatch monitoring, and forecasting in one centralized
+                management system.
 
-Manage egg production, inventory, QR code tracking,
-dispatch monitoring, and forecasting in one centralized
-management system.
+            </p>
 
-</p>
+            <div class="feature">
 
-<div class="feature">
+                <div class="feature-icon">🥚</div>
 
-<div class="feature-icon">🥚</div>
+                <div>
 
-<div>
+                    <strong>Production Monitoring</strong><br>
 
-<strong>Production Monitoring</strong><br>
+                    Track daily egg production accurately.
 
-Track daily egg production accurately.
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <div class="feature">
 
-<div class="feature">
+                <div class="feature-icon">📦</div>
 
-<div class="feature-icon">📦</div>
+                <div>
 
-<div>
+                    <strong>Inventory Management</strong><br>
 
-<strong>Inventory Management</strong><br>
+                    Monitor feeds, supplements and egg trays.
 
-Monitor feeds, supplements and egg trays.
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <div class="feature">
 
-<div class="feature">
+                <div class="feature-icon">📱</div>
 
-<div class="feature-icon">📱</div>
+                <div>
 
-<div>
+                    <strong>QR Egg Tracking</strong><br>
 
-<strong>QR Egg Tracking</strong><br>
+                    Fast scanning with reusable QR codes.
 
-Fast scanning with reusable QR codes.
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <div class="feature">
 
-<div class="feature">
+                <div class="feature-icon">📈</div>
 
-<div class="feature-icon">📈</div>
+                <div>
 
-<div>
+                    <strong>Forecasting</strong><br>
 
-<strong>Forecasting</strong><br>
+                    Predict future production trends.
 
-Predict future production trends.
+                </div>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
+        <div class="right-panel">
 
-<div class="right-panel">
+            <div class="logo">
 
-<div class="logo">
+                <span>🐔</span>
 
-<span>🐔</span>
+            </div>
 
-</div>
+            <div class="title">
 
-<div class="title">
+                Welcome Back
 
-Welcome Back
+            </div>
 
-</div>
+            <div class="subtitle">
 
-<div class="subtitle">
+                Sign in to continue
 
-Sign in to continue
+            </div>
 
-</div>
+            @if($errors->any())
 
-@if($errors->any())
+                <div class="error-box">
 
-<div class="error-box">
+                    {{ $errors->first() }}
 
-{{ $errors->first() }}
+                </div>
 
-</div>
+            @endif
+            <form method="POST" action="{{ route('login.submit') }}">
 
-@endif
+                @csrf
 
-<form method="POST" action="{{ route('login.submit') }}">
+                <label>
 
-@csrf
+                    Username
 
-<label>
+                </label>
 
-Username
+                <input type="text" name="username" value="{{ old('username') }}" placeholder="Enter your username"
+                    required>
 
-</label>
+                <label>
 
-<input
-type="text"
-name="username"
-value="{{ old('username') }}"
-placeholder="Enter your username"
-required>
+                    Password
 
-<label>
+                </label>
 
-Password
+                <div class="password-container">
 
-</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-<div class="password-container">
+                    <span class="toggle-password" onclick="togglePassword()">
 
-<input
-type="password"
-id="password"
-name="password"
-placeholder="Enter your password"
-required>
+                        👁️
 
-<span
-class="toggle-password"
-onclick="togglePassword()">
+                    </span>
 
-👁️
+                </div>
+                <div class="terms">
 
-</span>
+                    <input type="checkbox" name="terms" value="1" {{ old('terms') ? 'checked' : '' }}>
 
-</div>
-<div class="terms">
+                    <span>
 
-    <input
-        type="checkbox"
-        name="terms"
-        value="1"
-        {{ old('terms') ? 'checked' : '' }}>
+                        I have read and agree to the
 
-    <span>
+                        <a href="{{ route('terms') }}" target="_blank">
 
-        I have read and agree to the
+                            Terms and Conditions
 
-        <a href="{{ route('terms') }}" target="_blank">
+                        </a>
 
-            Terms and Conditions
+                    </span>
 
-        </a>
+                </div>
 
-    </span>
+                <div class="remember-row">
 
-</div>
+                    <label class="remember">
 
-<div class="remember-row">
+                        <input type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
 
-    <label class="remember">
+                        <span>
 
-        <input
-            type="checkbox"
-            name="remember"
-            value="1"
-            {{ old('remember') ? 'checked' : '' }}>
+                            Keep me logged in
 
-        <span>
+                        </span>
 
-            Keep me logged in
+                    </label>
 
-        </span>
+                    <a href="{{ route('forgot.password') }}" class="forgot-password">
 
-    </label>
+                        Forgot Password?
 
-    <a
-        href="{{ route('forgot.password') }}"
-        class="forgot-password">
+                    </a>
 
-        Forgot Password?
+                </div>
+                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}">
 
-    </a>
+                </div>
 
-</div>
+                @error('g-recaptcha-response')
 
-<div class="g-recaptcha"
-     data-sitekey="{{ config('services.recaptcha.site_key') }}">
+                                    <div style="
+                    margin-top:10px;
+                    color:#d32f2f;
+                    font-size:14px;
+                    font-weight:500;
+                    ">
 
-</div>
+                                        {{ $message }}
 
-@error('g-recaptcha-response')
+                                    </div>
 
-<div style="
-margin-top:10px;
-color:#d32f2f;
-font-size:14px;
-font-weight:500;
-">
+                @enderror
 
-{{ $message }}
+                <button type="submit" class="login-btn">
 
-</div>
+                    Login
 
-@enderror
+                </button>
 
-<button
-    type="submit"
-    class="login-btn">
+            </form>
 
-    Login
+            <div class="footer">
 
-</button>
+                © {{ date('Y') }} NB Poultry Farm Management System
 
-</form>
+            </div>
 
-<div class="footer">
+        </div>
 
-    © {{ date('Y') }} NB Poultry Farm Management System
+    </div>
 
-</div>
+    <script>
 
-</div>
+        function togglePassword() {
 
-</div>
+            let password = document.getElementById('password');
 
-<script>
+            if (password.type === 'password') {
 
-function togglePassword(){
+                password.type = 'text';
 
-    let password = document.getElementById('password');
+            } else {
 
-    if(password.type === 'password'){
+                password.type = 'password';
 
-        password.type='text';
+            }
 
-    }else{
+        }
 
-        password.type='password';
-
-    }
-
-}
-
-</script>
+    </script>
 
 </body>
 

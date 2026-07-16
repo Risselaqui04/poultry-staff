@@ -38,7 +38,7 @@ class AuthController extends Controller
         $recaptchaResponse = Http::asForm()->post(
             'https://www.google.com/recaptcha/api/siteverify',
             [
-                'secret'   => config('services.recaptcha.secret_key'),
+                'secret' => config('services.recaptcha.secret_key'),
                 'response' => $request->input('g-recaptcha-response'),
                 'remoteip' => $request->ip(),
             ]
@@ -56,7 +56,7 @@ class AuthController extends Controller
 
         // Login Credentials
         $credentials = [
-            'email' => $request->username,
+            'username' => $request->username,
             'password' => $request->password,
         ];
 
@@ -65,8 +65,23 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            // Redirect to Dashboard
-            return redirect()->route('dashboard');
+            // Redirect based on role
+            $user = Auth::user();
+
+            switch ($user->role) {
+
+                case 'owner':
+                    return redirect()->route('owner.dashboard');
+
+                case 'manager':
+                    return redirect()->route('manager.dashboard');
+
+                case 'staff':
+                    return redirect()->route('staff.dashboard');
+
+                default:
+                    return redirect()->route('dashboard');
+            }
         }
 
         return back()

@@ -11,6 +11,10 @@ use App\Http\Controllers\QrScannerController;
 use App\Http\Controllers\QrRecordController;
 use App\Http\Controllers\QrTransactionController;
 use App\Http\Controllers\ProductionDetailsController;
+use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\DispatchController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -42,11 +46,45 @@ Route::post('/forgot-password/verify', [ForgotPasswordController::class, 'verify
 Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])
     ->name('forgot.reset');
 
-    Route::view('/terms', 'terms')->name('terms');
+Route::view('/terms', 'terms')->name('terms');
 
 /*
 |--------------------------------------------------------------------------
 | Protected Routes
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| OWNER ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])
+    ->prefix('owner')
+    ->name('owner.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [OwnerDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Dispatch
+        Route::get('/dispatch', [DispatchController::class, 'index'])
+            ->name('dispatch');
+
+        Route::post('/dispatch/store', [DispatchController::class, 'store'])
+            ->name('dispatch.store');
+
+        Route::put('/dispatch/update/{dispatch}', [DispatchController::class, 'update'])
+            ->name('dispatch.update');
+
+        Route::delete('/dispatch/delete/{dispatch}', [DispatchController::class, 'destroy'])
+            ->name('dispatch.destroy');
+    });
+/*
+|--------------------------------------------------------------------------
+| STAFF / CURRENT SYSTEM ROUTES
 |--------------------------------------------------------------------------
 */
 
@@ -73,11 +111,7 @@ Route::middleware(['auth'])->group(function () {
     // Forecast
     Route::view('/forecast', 'forecast')
         ->name('forecast');
-
-    // Dispatch
-    Route::view('/dispatch', 'dispatch')
-        ->name('dispatch');
-
+        
     // Revenue
     Route::view('/revenue', 'revenue')
         ->name('revenue');
@@ -110,13 +144,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
 
-     Route::post('/inventory/update', [InventoryController::class, 'update'])
-        ->name('inventory.update');
-
-     Route::post('/inventory/update/{id}', [InventoryController::class, 'updateStock'])
-        ->name('inventory.update');
-
-        // Inventory
+    // Inventory
     Route::post('/inventory/store', [InventoryController::class, 'store'])
         ->name('inventory.store');
 
@@ -124,19 +152,23 @@ Route::middleware(['auth'])->group(function () {
         ->name('inventory.update');
 
     Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
-        ->name('inventory.delete');
+        ->name('inventory.destroy');
 
-        Route::post('/inventory/store', [InventoryController::class, 'store'])
-    ->name('inventory.store');
+    // Dispatch
+    Route::get('/dispatch', [DispatchController::class, 'index'])
+        ->name('dispatch');
 
-Route::post('/inventory/update/{id}', [InventoryController::class, 'update'])
-    ->name('inventory.update');
+    Route::post('/dispatch/store', [DispatchController::class, 'store'])
+        ->name('dispatch.store');
 
-Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
-    ->name('inventory.destroy');
-    
+    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])
+        ->name('dispatch.update');
+
+    Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
+        ->name('dispatch.destroy');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
 });

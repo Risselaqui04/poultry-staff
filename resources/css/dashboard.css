@@ -111,22 +111,45 @@
 
 }
 
-/* ===========================
+/* ===================================
    LOGOUT
-=========================== */
+=================================== */
 
 .logout{
 
-    margin-top:250px;
-    padding:50px;
+    padding:20px;
+
+    border-top:1px solid rgba(255,255,255,.08);
 
 }
 
 .logout button{
 
+    margin-top: 500px;
+
     width:100%;
-    color:rgb(253, 253, 253);
-    background:#2E7D32;
+
+    border:none;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    background:#d32f2f;
+
+    color:#fff;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.logout button:hover{
+
+    background:#b71c1c;
 
 }
 
@@ -753,12 +776,23 @@ height:auto;
             font-size: 14px;
         }
 
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
+      .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:20px;
+}
+
+@media(max-width:1200px){
+    .stat-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:768px){
+    .stat-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
 
         .stat-card {
             background: #fff;
@@ -826,3 +860,5 @@ height:auto;
             border-bottom: 1px solid #f2f2f2;
             font-size: 14px;
         }
+
+        

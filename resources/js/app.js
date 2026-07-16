@@ -1,4 +1,5 @@
 import './bootstrap';
+import './sidebar';
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Confirm logout
 document.addEventListener('DOMContentLoaded', () => {
 
-    const logoutForm = document.querySelector('.logout-form');
+    const logoutForm = document.querySelector('.logout');
 
     if (logoutForm) {
 
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Sidebar active effect
 document.addEventListener('DOMContentLoaded', () => {
 
-    const menuLinks = document.querySelectorAll('.menu li a');
+    const menuLinks = document.querySelectorAll('.sidebar nav ul li a');
 
     menuLinks.forEach(link => {
 

@@ -5,11 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Production;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\DB;
+use App\Models\DailyInventoryLog;
 
 class DashboardController extends Controller
 {
    public function index()
 {
+    $today = now()->toDateString();
+
+if (!DailyInventoryLog::where('log_date', $today)->exists()) {
+
+    // FEEDS
+    Inventory::where('item_type', 'Feed')
+        ->decrement('quantity', 15);
+
+    // VITAMINS
+    Inventory::where('item_type', 'Supplement')
+        ->decrement('quantity', 500);
+
+    DailyInventoryLog::create([
+        'log_date' => $today
+    ]);
+}
     /*
     |--------------------------------------------------------------------------
     | Latest Production Date

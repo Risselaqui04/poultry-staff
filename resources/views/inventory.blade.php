@@ -18,6 +18,20 @@
                 <span class="stat-sub">pcs — {{ $eggsStock > 0 ? 'OK' : 'No Data' }}</span>
             </div>
 
+            <div class="stat-card">
+
+                <span class="stat-label">OVERALL EGGS</span>
+
+                <div class="stat-value">
+                    {{ number_format($overallEggs) }}
+                </div>
+
+                <span class="stat-sub">
+                    Total eggs available
+                </span>
+
+            </div>
+
             <div class="stat-card {{ $feed && $feed->current_stock < $feed->min_level ? 'stat-card-alert' : '' }}">
                 <span class="stat-label">FEED</span>
                 <div class="stat-value {{ $feed && $feed->current_stock < $feed->min_level ? 'text-danger' : '' }}">
@@ -31,13 +45,13 @@
             <div class="stat-card">
                 <span class="stat-label">SUPPLEMENTS</span>
                 <div class="stat-value">{{ $supplements->current_stock ?? 0 }}</div>
-                <span class="stat-sub">{{ $supplements->unit ?? 'pack' }} — OK</span>
+                <span class="stat-sub">{{ $supplements->unit ?? 'ML' }} — OK</span>
             </div>
 
             <div class="stat-card">
                 <span class="stat-label">EGG TRAYS</span>
                 <div class="stat-value">{{ $eggTrays->current_stock ?? 0 }}</div>
-                <span class="stat-sub">pcs — Watch</span>
+                <span class="stat-sub">Trays — Watch</span>
             </div>
         </div>
 
@@ -72,15 +86,6 @@
                         {{ $item->status }}
                     </td>
                     <td>
-
-                        <button class="btn btn-success btn-sm updateStock" data-id="{{ $item->inventory_id }}"
-                            data-item="{{ $item->item_name }}" data-stock="{{ $item->quantity }}">
-
-                            <i class="fas fa-edit"></i>
-
-                            Update
-
-                        </button>
 
                         <form action="{{ route('inventory.destroy', $item->inventory_id) }}" method="POST"
                             class="d-inline deleteForm">
@@ -357,27 +362,6 @@
     </div>
 
     <script>
-
-        const stockModal = new bootstrap.Modal(document.getElementById('updateStockModal'));
-
-        document.querySelectorAll('.updateStock').forEach(btn => {
-
-            btn.addEventListener('click', function () {
-
-                document.getElementById('item_name').value =
-                    this.dataset.item;
-
-                document.getElementById('current_stock').value =
-                    this.dataset.stock;
-
-                document.getElementById('updateForm').action =
-                    '/inventory/update/' + this.dataset.id;
-
-                stockModal.show();
-
-            });
-
-        });
 
         document.querySelectorAll('.deleteForm').forEach(form => {
 

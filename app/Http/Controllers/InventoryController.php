@@ -10,6 +10,9 @@ class InventoryController extends Controller
 {
     public function index()
     {
+
+        $overallEggs = Production::sum('eggs_produced');
+
         // Inventory Items
         $items = Inventory::orderBy('item_name')->get();
 
@@ -63,7 +66,8 @@ class InventoryController extends Controller
             'supplements',
             'eggTrays',
             'eggsStock',
-            'eggProduction'
+            'eggProduction',
+            'overallEggs'
         ));
     }
 
@@ -75,51 +79,21 @@ class InventoryController extends Controller
 
     public function store(Request $request)
     {
-       $request->validate([
-    'item_name' => 'required|string|max:255',
-    'item_type' => 'required|string',
-    'quantity' => 'required|integer|min:0',
-    'minimum_stock' => 'required|integer|min:0',
-]);
+        $request->validate([
+            'item_name' => 'required|string|max:255',
+            'item_type' => 'required|string',
+            'quantity' => 'required|integer|min:0',
+            'minimum_stock' => 'required|integer|min:0',
+        ]);
 
         Inventory::create([
-    'item_name' => $request->input('item_name'),
-    'item_type' => $request->input('item_type'),
-    'quantity' => (int) $request->input('quantity'),
-    'minimum_stock' => (int) $request->input('minimum_stock'),
-]);
+            'item_name' => $request->input('item_name'),
+            'item_type' => $request->input('item_type'),
+            'quantity' => (int) $request->input('quantity'),
+            'minimum_stock' => (int) $request->input('minimum_stock'),
+        ]);
         return back()->with('success', 'Item added successfully.');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE STOCK
-    |--------------------------------------------------------------------------
-    */
-
-   public function update(Request $request, $id)
-{
-    $request->validate([
-        'operation' => 'required|in:add,deduct',
-        'quantity' => 'required|integer|min:1',
-    ]);
-
-    $item = Inventory::findOrFail($id);
-
-    if ($request->operation == 'add') {
-        $item->quantity += $request->quantity;
-    } else {
-        if ($item->quantity < $request->quantity) {
-            return back()->with('error', 'Insufficient stock.');
-        }
-
-        $item->quantity -= $request->quantity;
-    }
-
-    $item->save();
-
-    return back()->with('success', 'Stock updated successfully.');
-}
 
     /*
     |--------------------------------------------------------------------------

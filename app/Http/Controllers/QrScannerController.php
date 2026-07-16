@@ -7,6 +7,7 @@ use App\Models\QrTransaction;
 use App\Models\Production;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Inventory;
 
 class QrScannerController extends Controller
 {
@@ -99,6 +100,23 @@ class QrScannerController extends Controller
             'scanned_by' => auth()->id(),
             'scanned_at' => now()
         ]);
+        /*
+        ---------------------------------------
+        Deduct Empty Egg Trays
+        ---------------------------------------
+        */
+
+        $eggTray = Inventory::where('item_type', 'Egg Tray')->first();
+
+        if ($eggTray) {
+
+            $eggTray->quantity = max(
+                0,
+                $eggTray->quantity - $qr->tray_count
+            );
+
+            $eggTray->save();
+        }
 
         /*
         ---------------------------------------
@@ -158,12 +176,12 @@ class QrScannerController extends Controller
         */
 
         return response()->json([
-    'success' => true,
-    'message' => 'QR scanned successfully.',
-    'qr_code' => $qr->qr_code,
-    'batch' => $qr->batch_id,
-    'size' => $qr->egg_size,
-    'eggs' => $qr->tray_count * $qr->eggs_per_tray,
-]);
+            'success' => true,
+            'message' => 'QR scanned successfully.',
+            'qr_code' => $qr->qr_code,
+            'batch' => $qr->batch_id,
+            'size' => $qr->egg_size,
+            'eggs' => $qr->tray_count * $qr->eggs_per_tray,
+        ]);
     }
 }

@@ -40,6 +40,7 @@
 
         if ($role === 'farm owner') {
             $role = 'owner';
+            
         }
 
         $roleLabels = [
@@ -53,34 +54,39 @@
             [
                 'label' => 'Dashboard',
                 'icon' => 'fas fa-chart-line',
-                'route' => $role . '.dashboard',
+                'route' => $role == 'owner'
+                    ? 'owner.dashboard'
+                    : 'dashboard',
                 'roles' => ['owner', 'manager', 'staff'],
             ],
-
             [
                 'label' => 'Production',
                 'icon' => 'fas fa-egg',
-                'route' => $role . '.production',
+                'route' => $role == 'owner'
+                    ? 'owner.production'
+                    : 'production',
                 'roles' => ['owner', 'manager', 'staff'],
             ],
-
             [
                 'label' => 'Inventory',
                 'icon' => 'fas fa-box',
-                'route' => $role . '.inventory.index',
+                'route' => $role == 'owner'
+                    ? 'owner.inventory'
+                    : 'inventory',
                 'roles' => ['owner', 'manager', 'staff'],
             ],
-
-            [
-                'label' => 'Dispatch',
-                'icon' => 'fas fa-truck',
-                'route' => $role . '.dispatch',
-                'roles' => ['owner', 'manager'],
-            ],
-
+           [
+    'label' => 'Dispatch',
+    'icon' => 'fas fa-truck',
+    'route' => $role === 'owner'
+        ? 'owner.dispatch'
+        : 'dispatch',
+    'roles' => ['owner', 'manager'],
+],
         ];
 
     @endphp
+
     <div class="wrapper">
 
         <!-- SIDEBAR -->
@@ -96,19 +102,23 @@
             </div>
 
             <nav>
-                <ul>
-                    @foreach ($menuItems as $item)
-                        @if(Route::has($item['route']))
-                            <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
-                                <a href="{{ route($item['route']) }}">
-                                    <i class="{{ $item['icon'] }}"></i>
-                                    {{ $item['label'] }}
-                                </a>
-                            </li>
-                        @endif
-                    @endforeach
-                </ul>
-            </nav>
+    <ul>
+        @foreach ($menuItems as $item)
+
+            @if(in_array($role, $item['roles']))
+
+                <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
+                    <a href="{{ route($item['route']) }}">
+                        <i class="{{ $item['icon'] }}"></i>
+                        {{ $item['label'] }}
+                    </a>
+                </li>
+
+            @endif
+
+        @endforeach
+    </ul>
+</nav>
 
             <form action="{{ route('logout') }}" method="POST" class="logout">
                 @csrf

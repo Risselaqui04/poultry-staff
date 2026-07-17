@@ -54,14 +54,26 @@ class ProductionController extends Controller
     ->whereIn('production_id', $productionIds)
     ->get();
 
-        return view('production', [
-            'productions'    => $productions,
-            'totalEggs'      => $totalEggs,
-            'qrTransactions' => $qrTransactions,
-            'selectedDate'   => $date,
-            'viewType'       => $view,
-        ]);
+            $selectedDate = $date;
+$viewType = $view;
 
-    }
+if (request()->routeIs('owner.*')) {
+    return view('owner.production', compact(
+        'productions',
+        'totalEggs',
+        'qrTransactions',
+        'selectedDate',
+        'viewType'
+    ));
+}
 
+return view('production', compact(
+    'productions',
+    'totalEggs',
+    'qrTransactions',
+    'selectedDate',
+    'viewType'
+));
+
+}
 }

@@ -65,9 +65,19 @@ Route::middleware(['auth'])
     ->name('owner.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', [OwnerDashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::get('/production', [ProductionController::class, 'index'])
+            ->name('production');
+
+        Route::get('/inventory', [InventoryController::class, 'index'])
+            ->name('inventory');
+            Route::post('/inventory/store', [InventoryController::class, 'store'])
+    ->name('inventory.store');
+
+Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
+    ->name('inventory.destroy');
 
         // Dispatch
         Route::get('/dispatch', [DispatchController::class, 'index'])
@@ -111,7 +121,7 @@ Route::middleware(['auth'])->group(function () {
     // Forecast
     Route::view('/forecast', 'forecast')
         ->name('forecast');
-        
+
     // Revenue
     Route::view('/revenue', 'revenue')
         ->name('revenue');

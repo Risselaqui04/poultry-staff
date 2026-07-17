@@ -65,19 +65,24 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            // Redirect based on role
             $user = Auth::user();
 
-            switch ($user->role) {
+            // Normalize role
+            $role = strtolower(trim($user->role));
 
+            switch ($role) {
+
+                case 'farm owner':
                 case 'owner':
                     return redirect()->route('owner.dashboard');
 
+                case 'farm manager':
                 case 'manager':
-                    return redirect()->route('manager.dashboard');
+                    return redirect()->route('dashboard');
 
+                case 'poultry staff':
                 case 'staff':
-                    return redirect()->route('staff.dashboard');
+                    return redirect()->route('dashboard');
 
                 default:
                     return redirect()->route('dashboard');

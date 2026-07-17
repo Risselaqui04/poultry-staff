@@ -156,7 +156,7 @@ SUMMARY CARDS
 
                 </form>
 
-                <a href="{{ route(auth()->user()->role . '.production.scan') }}"
+                <a href="{{ route('production.scan') }}"
                    class="btn btn-success w-100">
 
                     <i class="fas fa-camera"></i>
@@ -182,9 +182,9 @@ PRODUCTION TABLE
 
     <div class="table-title d-flex justify-content-between align-items-center">
 
-        <h2>Egg Production</h2>
+        <h2>Today's Egg Production</h2>
 
-        <form method="GET" action="{{ route('owner.production') }}" class="d-flex gap-2">
+        <form method="GET" action="{{ route('production') }}" class="d-flex gap-2">
 
     <input
         type="text"
@@ -196,7 +196,7 @@ PRODUCTION TABLE
         type="date"
         name="date"
         class="form-control"
-        value="{{ $selectedDate->toDateString() }}"
+        value="{{ $selectedDate }}"
         onchange="this.form.submit()">
 
 </form>
@@ -282,7 +282,7 @@ PRODUCTION TABLE
 
            <td>
 
-                    <a href="{{ route(auth()->user()->role . '.production.details', $production->production_id) }}"
+                    <a href="{{ route('production.details', $production->production_id) }}"
                     class="btn btn-success btn-sm">
 
                         <i class="fas fa-eye"></i>

@@ -1,325 +1,438 @@
 @extends('layouts.sidebar')
-
 @section('title', 'Inventory')
-@section('page-label', 'Inventory')
+@section('content')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/inventory.css') }}">
+@vite('resources/css/inventory.css')
 @endpush
 
-@section('content')
-<div class="inventory-page">
+    <div class="inventory-page">
 
-    <div class="page-header">
+        @if($feed && $feed->current_stock < $feed->min_level)
+            <div class="alert-low">
+                ⚠ <strong>Feed stock below reorder point</strong>
+                — Current: {{ $feed->current_stock }}
+                Immediate reorder suggested.
+            </div>
+        @endif
+
+        <div class="stat-grid">
+
+    <div class="stat-card">
+        <div class="stat-content">
+            <div class="stat-left">
+                <span class="stat-label">EGGS<br>STOCK</span>
+            </div>
+
+            <div class="stat-right">
+                <div class="stat-value">{{ number_format($eggsStock) }}</div>
+                <span class="stat-sub">pcs — {{ $eggsStock > 0 ? 'OK' : 'No Data' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-content">
+            <div class="stat-left">
+                <span class="stat-label">OVERALL<br>EGGS</span>
+            </div>
+
+            <div class="stat-right">
+                <div class="stat-value">{{ number_format($overallEggs) }}</div>
+                <span class="stat-sub">Total eggs available</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card {{ $feed && $feed->current_stock < $feed->min_level ? 'stat-card-alert' : '' }}">
+        <div class="stat-content">
+            <div class="stat-left">
+                <span class="stat-label">FEED</span>
+            </div>
+
+            <div class="stat-right">
+                <div class="stat-value {{ $feed && $feed->current_stock < $feed->min_level ? 'text-danger' : '' }}">
+                    {{ $feed->current_stock ?? 0 }}
+                </div>
+
+                <span class="stat-sub {{ $feed && $feed->current_stock < $feed->min_level ? 'text-danger' : '' }}">
+                    Min: {{ $feed->min_level ?? 0 }} — {{ $feed && $feed->current_stock < $feed->min_level ? 'LOW' : 'OK' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-content">
+            <div class="stat-left">
+                <span class="stat-label">SUPPLEMENTS</span>
+            </div>
+
+            <div class="stat-right">
+                <div class="stat-value">{{ $supplements->current_stock ?? 0 }}</div>
+                <span class="stat-sub">{{ $supplements->unit ?? 'ML' }} — OK</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-content">
+            <div class="stat-left">
+                <span class="stat-label">EGG<br>TRAYS</span>
+            </div>
+
+            <div class="stat-right">
+                <div class="stat-value">{{ $eggTrays->current_stock ?? 0 }}</div>
+                <span class="stat-sub">Trays — Watch</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
         <div>
-            <h1>Inventory Overview</h1>
-        </div>
-        <button class="btn-update" onclick="openStockModal()">+ Add Stock</button>
-    </div>
+            <button class="btn-update" data-bs-toggle="modal" data-bs-target="#addItemModal">
 
-   @php
-    $alertItems = $items->filter(fn($item) => in_array($item->status, ['LOW', 'WATCH']));
-@endphp
+                + Add Stock
 
-@if($alertItems->isNotEmpty())
-    @foreach($alertItems as $alertItem)
-        <div class="alert-low {{ $alertItem->status === 'WATCH' ? 'alert-watch' : '' }}">
-            @if($alertItem->status === 'LOW')
-                ⚠ <strong>{{ $alertItem->item_name }} stock below reorder point</strong>
-            @else
-                👁 <strong>{{ $alertItem->item_name }} stock approaching minimum level</strong>
-            @endif
-            — Current: {{ $alertItem->current_stock }} {{ $alertItem->unit }} | Minimum: {{ $alertItem->min_level }} {{ $alertItem->unit }}.
-            {{ $alertItem->status === 'LOW' ? 'Immediate reorder suggested.' : 'Monitor closely.' }}
-        </div>
-    @endforeach
-@endif
-
-    <!-- STAT CARDS -->
-    <div class="stat-grid">
-        <div class="stat-card">
-            <span class="stat-label">Eggs Stock</span>
-            <div class="stat-value">{{ number_format($eggsStock) }}</div>
-            <span class="stat-sub">pcs — {{ $eggsStock > 0 ? 'OK' : 'No Data' }}</span>
-        </div>
-
-        <div class="stat-card {{ ($feed->status ?? '') === 'LOW' ? 'stat-card-alert' : (($feed->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
-            <span class="stat-label">Feed</span>
-            <div class="stat-value {{ ($feed->status ?? '') === 'LOW' ? 'text-danger' : (($feed->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
-                {{ $feed->current_stock ?? 0 }} {{ $feed->unit ?? '' }}
-            </div>
-            <span class="stat-sub">
-                Min: {{ $feed->min_level ?? 0 }} — {{ $feed->status ?? 'OK' }}
-            </span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-label">Supplements</span>
-            <div class="stat-value">{{ $supplements->current_stock ?? 0 }}</div>
-            <span class="stat-sub">{{ $supplements->unit ?? 'bottle' }} — OK</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-label">Egg Trays</span>
-            <div class="stat-value">{{ $eggTrays->current_stock ?? 0 }}</div>
-            <span class="stat-sub">pcs</span>
+            </button>
         </div>
     </div>
-
-<!-- FILTER BAR (aligned right) -->
-    <form method="GET" class="filter-bar">
-        <input type="text" name="search" placeholder="Search item..." value="{{ $search }}">
-
-        <select name="status" onchange="this.form.submit()">
-            <option value="">All Status</option>
-            <option value="LOW" {{ $statusFilter === 'LOW' ? 'selected' : '' }}>Low</option>
-            <option value="WATCH" {{ $statusFilter === 'WATCH' ? 'selected' : '' }}>Watch</option>
-            <option value="OK" {{ $statusFilter === 'OK' ? 'selected' : '' }}>OK</option>
-        </select>
-    </form>
-
-    <!-- ITEMS TABLE -->
-    <div class="inventory-table-wrapper">
-        <table class="inventory-table">
-            <thead>
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th>ITEM</th>
+                <th>CURRENT STOCK</th>
+                <th>MIN LEVEL</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($items as $item)
                 <tr>
-                    <th>Item</th>
-                    <th>Current Stock</th>
-                    <th>Min Level</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <td>{{ $item->item_name }}</td>
+                    <td class="{{ $item->status === 'LOW' ? 'text-danger fw-bold' : '' }}">
+                        {{ $item->quantity }}
+                    </td>
+                    <td>{{ $item->minimum_stock }}</td>
+                    <td class="{{ $item->status === 'LOW' ? 'text-danger fw-bold' : 'text-success' }}">
+                        {{ $item->status }}
+                    </td>
+                    <td>
+
+                        <form action="{{ route('owner.inventory.destroy', $item->inventory_id) }}" method="POST"
+                            class="d-inline deleteForm">
+
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+
+                                <i class="fas fa-trash"></i>
+
+                                Delete
+
+                            </button>
+
+                        </form>
+
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-    <tbody>
-    @forelse($items as $item)
-    <tr>
-        <td>{{ $item->item_name }} ({{ $item->unit }})</td>
-        <td class="{{ $item->status === 'LOW' ? 'text-danger fw-bold' : '' }}">
-            {{ $item->current_stock }}
-        </td>
-        <td>{{ $item->min_level }}</td>
-        <td>
-            <span class="status-icon status-icon-{{ strtolower($item->status) }}">
-                @if($item->status === 'OK')
-                    <i class="fas fa-check-circle"></i>
-                @elseif($item->status === 'WATCH')
-                    <i class="fas fa-eye"></i>
-                @else
-                    <i class="fas fa-exclamation-triangle"></i>
-                @endif
-                {{ $item->status }}
-            </span>
-        </td>
-        <td class="action-cell">
-    <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, '{{ $item->item_name }}')" title="Add Stock"> <i class="fas fa-pen"></i> </button>
+            @endforeach
+        </tbody>
+    </table>
 
-    <form action="{{ route(auth()->user()->role . '.inventory.delete', $item->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete {{ $item->item_name }}? This cannot be undone.');">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="icon-btn icon-btn-delete" title="Delete">
-            <i class="fas fa-trash"></i>
-        </button>
-    </form>
-</td>
-    </tr>
-    @empty
-    <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No items found.</td></tr>
-    @endforelse
-</tbody>
-        </table>
+    <h2 class="section-title">Egg Production</h2>
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th>BATCH</th>
+                <th>SMALL</th>
+                <th>MEDIUM</th>
+                <th>LARGE</th>
+                <th>EXTRA LARGE</th>
+                <th>CRACKED</th>
+                <th>TOTAL</th>
+                <th>DATE</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($eggProduction as $prod)
+                <tr>
+                    <td>{{ $prod->batch }}</td>
+                    <td>{{ $prod->small }}</td>
+                    <td>{{ $prod->medium }}</td>
+                    <td>{{ $prod->large }}</td>
+                    <td>{{ $prod->extra_large }}</td>
+                    <td>{{ $prod->cracked }}</td>
+                    <td><strong>{{ number_format($prod->eggs_produced) }}</strong></td>
+                    <td>{{ \Carbon\Carbon::parse($prod->created_at)->format('M d, Y') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
     </div>
 
-    <div class="pagination-bar">
-        {{ $items->links() }}
-    </div>
 
-    <!-- TWO COLUMN: EGG TOTALS + RECENT MOVEMENTS -->
-    <div class="bottom-grid">
 
-        <!-- EGG PRODUCTION SUMMARY (per size, hindi per batch) -->
-        <div class="inventory-table-wrapper">
-            <div class="egg-summary-filter" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <h2 class="section-title" style="margin:0;">Egg Production Summary</h2>
+    <!-- UPDATE STOCK MODAL -->
 
-                <form method="GET" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="search" value="{{ $search }}">
-                    <input type="hidden" name="status" value="{{ $statusFilter }}">
+    <div class="modal fade" id="updateStockModal">
 
-                    <select name="year" class="sort-select" onchange="this.form.submit()">
-                        @foreach($availableMonths->pluck('year')->unique()->sortDesc() as $year)
-                            <option value="{{ $year }}" {{ (int) $year === (int) $selectedYear ? 'selected' : '' }}>
-                                {{ $year }}
-                            </option>
-                        @endforeach
-                    </select>
+        <div class="modal-dialog">
 
-                    <select name="month" class="sort-select" onchange="this.form.submit()">
-                        @foreach(range(1, 12) as $m)
-                            <option value="{{ $m }}" {{ (int) $m === (int) $selectedMonth ? 'selected' : '' }}>
-                                {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="modal-content">
+
+                <form method="POST" id="updateForm">
+
+                    @csrf
+
+                    <div class="modal-header bg-success text-white">
+
+                        <h5 class="modal-title">
+
+                            Update Stock
+
+                        </h5>
+
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label class="fw-bold">
+
+                                Item
+
+                            </label>
+
+                            <input type="text" id="item_name" class="form-control" readonly>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="fw-bold">
+
+                                Current Stock
+
+                            </label>
+
+                            <input type="text" id="current_stock" class="form-control" readonly>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="fw-bold">
+
+                                Operation
+
+                            </label>
+
+                            <select name="operation" class="form-select">
+
+                                <option value="add">
+
+                                    Add Stock
+
+                                </option>
+
+                                <option value="deduct">
+
+                                    Deduct Stock
+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="fw-bold">
+
+                                Quantity
+
+                            </label>
+
+                            <input type="number" name="quantity" min="1" class="form-control" required>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <button class="btn btn-success">
+
+                            Save
+
+                        </button>
+
+                    </div>
+
                 </form>
+
             </div>
 
-            <table class="inventory-table">
-                <thead>
-                    <tr>
-                        <th>Egg Size</th>
-                        <th>Total Produced</th>
-                        <th>% of Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $sizes = [
-                            'Small' => $eggTotals->small ?? 0,
-                            'Medium' => $eggTotals->medium ?? 0,
-                            'Large' => $eggTotals->large ?? 0,
-                            'Extra Large' => $eggTotals->extra_large ?? 0,
-                            'Cracked' => $eggTotals->cracked ?? 0,
-                        ];
-                    @endphp
-
-                    @foreach($sizes as $label => $value)
-                    <tr>
-                        <td>{{ $label }}</td>
-                        <td><strong>{{ number_format($value) }}</strong></td>
-                        <td>
-                            <div class="mini-bar">
-                                <div class="mini-bar-fill" style="width: {{ $grandTotal > 0 ? round(($value / $grandTotal) * 100, 1) : 0 }}%"></div>
-                            </div>
-                            <span class="mini-bar-label">{{ $grandTotal > 0 ? round(($value / $grandTotal) * 100, 1) : 0 }}%</span>
-                        </td>
-                    </tr>
-                    @endforeach
-
-                    <tr class="table-total-row">
-                        <td><strong>TOTAL</strong></td>
-                        <td><strong>{{ number_format($grandTotal) }}</strong></td>
-                        <td>100%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- RECENT STOCK MOVEMENTS -->
-        <div class="inventory-table-wrapper">
-            <h2 class="section-title" style="margin-top:0;">Recent Stock Updates</h2>
-
-            <ul class="movement-list">
-                @forelse($recentMovements as $move)
-                <li class="movement-item">
-                    <div class="movement-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="movement-info">
-                        <strong>{{ $move->item_name }}</strong>
-                        <span class="movement-sub">Current stock: {{ $move->current_stock }} {{ $move->unit }}</span>
-                    </div>
-                    <div class="movement-time">
-                        {{ \Carbon\Carbon::parse($move->updated_at)->diffForHumans() }}
-                    </div>
-                </li>
-                @empty
-                <li class="movement-item" style="justify-content:center; color:#999;">No recent updates.</li>
-                @endforelse
-            </ul>
         </div>
 
     </div>
 
-</div>
+    <!-- ADD ITEM MODAL -->
 
-<!-- ADD NEW ITEM MODAL -->
-<div class="modal-overlay" id="stockModal">
-    <div class="modal-box">
-        <h3>Add New Item</h3>
-        <form action="{{ route(auth()->user()->role . '.inventory.addStock') }}" method="POST">
-            @csrf
+    <div class="modal fade" id="addItemModal">
 
-            <label>Item Name</label>
-            <input type="text" name="item_name" placeholder="e.g. Feed" required>
+        <div class="modal-dialog">
 
-            <label>Unit</label>
-            <input type="text" name="unit" placeholder="e.g. sacks, pcs, bottles" required>
+            <form action="{{ route('owner.inventory.store') }}" method="POST">
 
-            <label>Current Stock</label>
-            <input type="number" name="current_stock" step="0.01" min="0" required>
+                @csrf
 
-            <label>Minimum Stock (Reorder Level)</label>
-            <input type="number" name="min_level" step="0.01" min="0" required>
+                <div class="modal-content">
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeStockModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save</button>
-            </div>
-        </form>
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+
+                            Add Inventory Item
+
+                        </h5>
+
+                        <button class="btn-close" data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Item Name
+
+                            </label>
+
+                            <input type="text" name="item_name" class="form-control" required>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Item Type</label>
+
+                            <select name="item_type" class="form-select" required>
+
+                                <option value="">Select Type</option>
+                                <option value="Feed">Feed</option>
+                                <option value="Supplement">Supplement</option>
+                                <option value="Egg Tray">Egg Tray</option>
+                                <option value="Other">Other</option>
+
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Current Stock
+
+                            </label>
+
+                            <input type="number" name="quantity" class="form-control" required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Minimum Stock
+
+                            </label>
+
+                            <input type="number" name="minimum_stock" class="form-control" required>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <button class="btn btn-success">
+
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
-</div>
 
-<!-- ADD STOCK QUANTITY MODAL -->
-<div class="modal-overlay" id="increaseModal">
-    <div class="modal-box">
-        <h3>Add Stock Quantity</h3>
-        <p style="color:#777; font-size:13px; margin:-10px 0 16px;">Item: <strong id="increaseItemName"></strong></p>
-        <form action="{{ route(auth()->user()->role . '.inventory.increaseStock') }}" method="POST">
-            @csrf
-            <input type="hidden" name="item_id" id="increaseItemId">
+    <script>
 
-            <label>Quantity to Add</label>
-            <input type="number" name="quantity" step="0.01" min="0.01" required>
+        document.querySelectorAll('.deleteForm').forEach(form => {
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeIncreaseModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save</button>
-            </div>
-        </form>
-    </div>
-</div>
+            form.addEventListener('submit', function (e) {
+
+                e.preventDefault();
+
+                Swal.fire({
+
+                    title: 'Delete Item?',
+
+                    text: 'This action cannot be undone.',
+
+                    icon: 'warning',
+
+                    showCancelButton: true,
+
+                    confirmButtonColor: '#d33',
+
+                    cancelButtonColor: '#6c757d',
+
+                    confirmButtonText: 'Delete'
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        form.submit();
+
+                    }
+
+                });
+
+            });
+
+        });
+
+
+    </script>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-
-function openStockModal() {
-    document.getElementById('stockModal').classList.add('active');
-}
-
-function closeStockModal() {
-    document.getElementById('stockModal').classList.remove('active');
-}
-
-function openIncreaseModal(itemId, itemName) {
-    document.getElementById('increaseItemId').value = itemId;
-    document.getElementById('increaseItemName').textContent = itemName;
-    document.getElementById('increaseModal').classList.add('active');
-}
-
-function closeIncreaseModal() {
-    document.getElementById('increaseModal').classList.remove('active');
-}
-
-document.getElementById('stockModal').addEventListener('click', function(e) {
-    if (e.target === this) closeStockModal();
-});
-
-document.getElementById('increaseModal').addEventListener('click', function(e) {
-    if (e.target === this) closeIncreaseModal();
-});
-
-@if(session('success'))
-Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: @json(session('success')),
-    confirmButtonColor: '#2E7D32',
-    timer: 2500,
-    timerProgressBar: true,
-});
-@endif
-</script>
-@endpush

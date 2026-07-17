@@ -9,68 +9,75 @@ use App\Models\Production;
 class InventoryController extends Controller
 {
     public function index()
-    {
+{
+    // Total eggs
+    $overallEggs = Production::sum('eggs_produced');
 
-        $overallEggs = Production::sum('eggs_produced');
+    // Inventory Items
+    $items = Inventory::orderBy('item_name')->get();
 
-        // Inventory Items
-        $items = Inventory::orderBy('item_name')->get();
+    // Summary Cards
+    $feed = (object) [
+        'current_stock' => Inventory::where('item_type', 'Feed')->sum('quantity'),
+        'min_level'     => Inventory::where('item_type', 'Feed')->sum('minimum_stock'),
+    ];
 
-        // Summary Cards
-        $feed = (object) [
-            'current_stock' => Inventory::where('item_type', 'Feed')->sum('quantity'),
-            'min_level' => Inventory::where('item_type', 'Feed')->sum('minimum_stock'),
-        ];
-        $supplements = (object) [
-            'current_stock' => Inventory::where('item_type', 'Supplement')->sum('quantity'),
-            'min_level' => Inventory::where('item_type', 'Supplement')->sum('minimum_stock'),
-        ];
-        $eggTrays = (object) [
-            'current_stock' => Inventory::where('item_type', 'Egg Tray')->sum('quantity'),
-            'min_level' => Inventory::where('item_type', 'Egg Tray')->sum('minimum_stock'),
-        ];
-        // Latest Production Date
+    $supplements = (object) [
+        'current_stock' => Inventory::where('item_type', 'Supplement')->sum('quantity'),
+        'min_level'     => Inventory::where('item_type', 'Supplement')->sum('minimum_stock'),
+    ];
 
-        $latestDate = Production::max('production_date');
+    $eggTrays = (object) [
+        'current_stock' => Inventory::where('item_type', 'Egg Tray')->sum('quantity'),
+        'min_level'     => Inventory::where('item_type', 'Egg Tray')->sum('minimum_stock'),
+    ];
 
-        // Total Eggs Stock
-        $eggsStock = Production::whereDate('production_date', $latestDate)
-            ->sum('eggs_produced');
+    // Latest Production Date
+    $latestDate = Production::max('production_date');
 
-        // Egg Production Table
-        $eggProduction = Production::whereDate('production_date', $latestDate)
-            ->orderBy('batch_id')
-            ->get([
-                'batch_id as batch',
-                'small_eggs as small',
-                'medium_eggs as medium',
-                'large_eggs as large',
-                'extra_large_eggs as extra_large',
-                'cracked_eggs as cracked',
-                'eggs_produced',
-                'production_date as created_at'
-            ]);
+    // Total Eggs Stock
+    $eggsStock = Production::whereDate('production_date', $latestDate)
+        ->sum('eggs_produced');
 
-        // Update Status Automatically
-        foreach ($items as $item) {
+    // Egg Production Table
+    $eggProduction = Production::whereDate('production_date', $latestDate)
+        ->orderBy('batch_id')
+        ->get([
+            'batch_id as batch',
+            'small_eggs as small',
+            'medium_eggs as medium',
+            'large_eggs as large',
+            'extra_large_eggs as extra_large',
+            'cracked_eggs as cracked',
+            'eggs_produced',
+            'production_date as created_at'
+        ]);
 
-            $item->status =
-                $item->quantity <= $item->minimum_stock
-                ? 'LOW'
-                : 'OK';
-        }
-
-        return view('inventory', compact(
-            'items',
-            'feed',
-            'supplements',
-            'eggTrays',
-            'eggsStock',
-            'eggProduction',
-            'overallEggs'
-        ));
+    // Inventory Status
+    foreach ($items as $item) {
+        $item->status = $item->quantity <= $item->minimum_stock
+            ? 'LOW'
+            : 'OK';
     }
 
+    $data = [
+        'items'         => $items,
+        'feed'          => $feed,
+        'supplements'   => $supplements,
+        'eggTrays'      => $eggTrays,
+        'overallEggs'   => $overallEggs,
+        'eggsStock'     => $eggsStock,
+        'eggProduction' => $eggProduction,
+    ];
+
+    // Owner page
+    if (request()->routeIs('owner.inventory')) {
+        return view('owner.inventory', $data);
+    }
+
+    // Staff page
+    return view('inventory', $data);
+}
     /*
     |--------------------------------------------------------------------------
     | ADD ITEM

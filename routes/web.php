@@ -162,6 +162,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
 
+        Route::prefix('owner')->name('owner.')->group(function () {
+
+    Route::get('/users', [UserController::class, 'index'])
+        ->name('users');
+
+    Route::post('/users', [UserController::class, 'store'])
+        ->name('users.store');
+
+    Route::put('/users/{user}', [UserController::class, 'update'])
+        ->name('users.update');
+
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+        ->name('users.toggleStatus');
+
+});
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');

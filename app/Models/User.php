@@ -22,6 +22,10 @@ class User extends Authenticatable
         'password',
         'security_question',
         'security_answer',
+
+        // Added for User Management
+        'status',
+        'last_login_at',
     ];
 
     /**
@@ -40,6 +44,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+
+            // Added for User Management
+            'last_login_at' => 'datetime',
         ];
     }
 }

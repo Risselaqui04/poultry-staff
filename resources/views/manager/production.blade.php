@@ -18,90 +18,160 @@ SUMMARY CARDS
 @endif
 <div class="row g-4 mb-4">
 
-    <!-- Today's Production -->
-    <div class="col-lg-4 col-md-6">
+    <div class="col-lg-3 col-md-6">
+
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body d-flex justify-content-between align-items-start">
 
-                <div>
-                    <small class="text-muted text-uppercase fw-semibold">
-                        Today's Production
-                    </small>
+            <div class="card-body">
 
-                    <h2 class="fw-bold mt-2 text-success">
-                        {{ number_format($totalEggs) }}
-                    </h2>
+                <div class="d-flex justify-content-between align-items-start">
 
-                    <small class="text-muted">
-                        Eggs Produced
-                    </small>
-                </div>
+                    <div>
 
-                <div class="icon-circle bg-success-subtle">
-                    <i class="fas fa-egg text-success"></i>
+                        <small class="text-muted text-uppercase fw-semibold">
+                            Today's Production
+                        </small>
+
+                        <h2 class="fw-bold mt-2 text-success">
+                            {{ number_format($totalEggs) }}
+                        </h2>
+
+                        <small class="text-muted">
+                            Eggs Produced
+                        </small>
+
+                    </div>
+
+                    <div class="icon-circle bg-success-subtle">
+
+                        <i class="fas fa-egg text-success"></i>
+
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
-    <!-- Active Batches -->
-    <div class="col-lg-4 col-md-6">
+    <div class="col-lg-3 col-md-6">
+
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body d-flex justify-content-between align-items-start">
 
-                <div>
-                    <small class="text-muted text-uppercase fw-semibold">
-                        Active Batches
-                    </small>
+            <div class="card-body">
 
-                    <h2 class="fw-bold mt-2 text-success">
-                        {{ $productions->count() }}
-                    </h2>
+                <div class="d-flex justify-content-between align-items-start">
 
-                    <small class="text-muted">
-                        Available Today
-                    </small>
-                </div>
+                    <div>
 
-                <div class="icon-circle bg-primary-subtle">
-                    <i class="fas fa-layer-group text-primary"></i>
+                        <small class="text-muted text-uppercase fw-semibold">
+                            Active Batches
+                        </small>
+
+                        <h2 class="fw-bold mt-2 text-success">
+                            {{ $productions->count() }}
+                        </h2>
+
+                        <small class="text-muted">
+                            Available Today
+                        </small>
+
+                    </div>
+
+                    <div class="icon-circle bg-primary-subtle">
+
+                        <i class="fas fa-layer-group text-primary"></i>
+
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
-    <!-- Forecast -->
-    <div class="col-lg-4 col-md-12">
+    <div class="col-lg-3 col-md-6">
+
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body d-flex justify-content-between align-items-start">
 
-                <div>
-                    <small class="text-muted text-uppercase fw-semibold">
-                        Predicted Eggs
-                    </small>
+            <div class="card-body">
 
-                    <h2 class="fw-bold mt-2 text-success">
-                        8,250
-                    </h2>
+                <div class="d-flex justify-content-between align-items-start">
 
-                    <small class="text-muted">
-                        Forecast
-                    </small>
-                </div>
+                    <div>
 
-                <div class="icon-circle bg-warning-subtle">
-                    <i class="fas fa-chart-line text-warning"></i>
+                        <small class="text-muted text-uppercase fw-semibold">
+                            Predicted Eggs
+                        </small>
+
+                        <h2 class="fw-bold mt-2 text-success">
+                            8,250
+                        </h2>
+
+                        <small class="text-muted">
+                            Forecast
+                        </small>
+
+                    </div>
+
+                    <div class="icon-circle bg-warning-subtle">
+
+                        <i class="fas fa-chart-line text-warning"></i>
+
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <small class="text-muted text-uppercase fw-semibold">
+                    QR Management
+                </small>
+
+                <form action="{{ route('qr.generate') }}" method="POST" class="mt-3">
+
+                    @csrf
+
+                    <button class="btn btn-primary w-100 mb-2">
+
+                        <i class="fas fa-qrcode"></i>
+
+                        Generate QR
+
+                    </button>
+
+                </form>
+
+                <a href="{{ route('production.scan') }}"
+                   class="btn btn-success w-100">
+
+                    <i class="fas fa-camera"></i>
+
+                    Scan QR
+
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
-
-
 
 
 <!-- ===========================

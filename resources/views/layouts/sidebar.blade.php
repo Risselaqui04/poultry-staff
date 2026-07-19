@@ -15,13 +15,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-   @vite([
-    'resources/css/app.css',
-    'resources/css/sidebar.css',
-    'resources/css/owner.dashboard.css',
-    'resources/css/users.css',
-    'resources/js/app.js'
-])
+    @vite([
+        'resources/css/app.css',
+        'resources/css/sidebar.css',
+        'resources/css/owner.dashboard.css',
+        'resources/css/production.css',
+        'resources/css/users.css',
+        'resources/js/app.js'
+    ])
     @stack('styles')
 
 </head>
@@ -55,34 +56,52 @@
             [
                 'label' => 'Dashboard',
                 'icon' => 'fas fa-chart-line',
-                'route' => $role == 'owner'
+                'route' =>
+                    $role == 'owner'
                     ? 'owner.dashboard'
-                    : 'dashboard',
+                    : ($role == 'manager'
+                        ? 'manager.dashboard'
+                        : 'dashboard'),
                 'roles' => ['owner', 'manager', 'staff'],
             ],
             [
                 'label' => 'Production',
                 'icon' => 'fas fa-egg',
-                'route' => $role == 'owner'
+                'route' =>
+                    $role == 'owner'
                     ? 'owner.production'
-                    : 'production',
+                    : ($role == 'manager'
+                        ? 'manager.production'
+                        : 'production'),
                 'roles' => ['owner', 'manager', 'staff'],
             ],
             [
                 'label' => 'Inventory',
                 'icon' => 'fas fa-box',
-                'route' => $role == 'owner'
+                'route' =>
+                    $role == 'owner'
                     ? 'owner.inventory'
-                    : 'inventory',
+                    : ($role == 'manager'
+                        ? 'manager.inventory'
+                        : 'inventory'),
                 'roles' => ['owner', 'manager', 'staff'],
             ],
             [
                 'label' => 'Dispatch',
                 'icon' => 'fas fa-truck',
-                'route' => $role === 'owner'
+                'route' =>
+                    $role == 'owner'
                     ? 'owner.dispatch'
-                    : 'dispatch',
+                    : ($role == 'manager'
+                        ? 'manager.dispatch'
+                        : 'dispatch'),
                 'roles' => ['owner', 'manager'],
+            ],
+            [
+                'label' => 'Reports',
+                'icon' => 'fas fa-file-alt',
+                'route' => 'manager.reports',
+                'roles' => ['manager'],
             ],
             [
                 'label' => 'Revenue',

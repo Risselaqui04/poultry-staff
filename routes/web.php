@@ -15,6 +15,7 @@ use App\Http\Controllers\QrScannerController;
 use App\Http\Controllers\QrRecordController;
 use App\Http\Controllers\QrTransactionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ManagerDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +33,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
 Route::get('/owner/users', [UserController::class, 'index'])
     ->name('owner.users');
-    
+
 // Forgot Password
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
     ->name('forgot.password');
@@ -48,7 +49,32 @@ Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPa
 
 Route::view('/terms', 'terms')->name('terms');
 
+/*
+|--------------------------------------------------------------------------
+| MANAGER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::prefix('manager')
+    ->middleware(['auth'])
+    ->name('manager.')
+    ->group(function () {
 
+        Route::get('/dashboard', [ManagerDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::view('/production', 'manager.production')
+            ->name('production');
+
+        Route::view('/inventory', 'manager.inventory')
+            ->name('inventory');
+
+        Route::view('/dispatch', 'manager.dispatch')
+            ->name('dispatch');
+
+        Route::view('/reports', 'manager.reports')
+            ->name('reports');
+
+    });
 /*
 |--------------------------------------------------------------------------
 | OWNER ROUTES
@@ -98,8 +124,8 @@ Route::middleware(['auth'])
         Route::delete('/dispatch/delete/{dispatch}', [DispatchController::class, 'destroy'])
             ->name('dispatch.destroy');
 
-             Route::get('/owner/users', [UserController::class, 'index'])
-        ->name('owner.users');
+        Route::get('/owner/users', [UserController::class, 'index'])
+            ->name('owner.users');
     });
 
 
@@ -138,6 +164,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
         ->name('inventory.destroy');
 
+        Route::get('/manager/dashboard', [ManagerDashboardController::class, 'index'])
+        ->name('manager.dashboard');
+        
     // QR Scanner
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
         ->name('production.scan');
@@ -162,22 +191,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
 
-        Route::prefix('owner')->name('owner.')->group(function () {
+    Route::prefix('owner')->name('owner.')->group(function () {
 
-    Route::get('/users', [UserController::class, 'index'])
-        ->name('users');
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users');
 
-    Route::post('/users', [UserController::class, 'store'])
-        ->name('users.store');
+        Route::post('/users', [UserController::class, 'store'])
+            ->name('users.store');
 
-    Route::put('/users/{user}', [UserController::class, 'update'])
-        ->name('users.update');
+        Route::put('/users/{user}', [UserController::class, 'update'])
+            ->name('users.update');
 
-    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-        ->name('users.toggleStatus');
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+            ->name('users.toggleStatus');
 
-});
+
+    });
+
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
 });

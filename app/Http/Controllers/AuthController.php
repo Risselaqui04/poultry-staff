@@ -68,32 +68,38 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Normalize role
-            $role = strtolower(trim($user->role));
+$role = strtolower(trim($user->role));
 
-            switch ($role) {
+switch ($role) {
 
-                case 'farm owner':
-                case 'owner':
-                    return redirect()->route('owner.dashboard');
+    case 'farm owner':
+    case 'owner':
+        return redirect()->route('owner.dashboard');
 
-                case 'farm manager':
-                case 'manager':
-                    return redirect()->route('dashboard');
+    case 'farm manager':
+    case 'manager':
+        return redirect()->route('manager.dashboard');
 
-                case 'poultry staff':
-                case 'staff':
-                    return redirect()->route('dashboard');
+    case 'poultry staff':
+    case 'staff':
+        return redirect()->route('dashboard');
 
-                default:
-                    return redirect()->route('dashboard');
-            }
-        }
+    default:
+        Auth::logout();
 
-        return back()
+        return redirect()
+            ->route('login')
             ->withErrors([
-                'username' => 'Invalid username or password.',
-            ])
-            ->withInput();
+                'username' => 'Unauthorized role.',
+            ]);
+}
+
+            return back()
+                ->withErrors([
+                    'username' => 'Invalid username or password.',
+                ])
+                ->withInput();
+        }
     }
 
     /**

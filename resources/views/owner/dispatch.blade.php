@@ -220,7 +220,7 @@
         <div class="modal fade" id="newDispatchModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
 
-                <form action="{{ route('dispatch.store') }}" method="POST">
+                <form action="{{ route('owner.dispatch.store') }}" method="POST">
 
                     @csrf
 

@@ -4,17 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ProductionDetailsController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\QrScannerController;
 use App\Http\Controllers\QrRecordController;
 use App\Http\Controllers\QrTransactionController;
-use App\Http\Controllers\ProductionDetailsController;
-use App\Http\Controllers\OwnerDashboardController;
-use App\Http\Controllers\DispatchController;
-
-
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,12 +27,12 @@ Route::get('/', function () {
 });
 
 // Login
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('login.submit');
-
+Route::get('/owner/users', [UserController::class, 'index'])
+    ->name('owner.users');
+    
 // Forgot Password
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
     ->name('forgot.password');
@@ -48,11 +48,6 @@ Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPa
 
 Route::view('/terms', 'terms')->name('terms');
 
-/*
-|--------------------------------------------------------------------------
-| Protected Routes
-|--------------------------------------------------------------------------
-*/
 
 /*
 |--------------------------------------------------------------------------
@@ -65,19 +60,30 @@ Route::middleware(['auth'])
     ->name('owner.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [OwnerDashboardController::class, 'index'])
             ->name('dashboard');
 
+        // Production
         Route::get('/production', [ProductionController::class, 'index'])
             ->name('production');
 
+        // Inventory
         Route::get('/inventory', [InventoryController::class, 'index'])
             ->name('inventory');
-            Route::post('/inventory/store', [InventoryController::class, 'store'])
-    ->name('inventory.store');
 
-Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
-    ->name('inventory.destroy');
+        Route::post('/inventory/store', [InventoryController::class, 'store'])
+            ->name('inventory.store');
+
+        Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
+            ->name('inventory.destroy');
+
+        // Revenue
+        Route::get('/revenue', [RevenueController::class, 'index'])
+            ->name('revenue');
+
+        Route::post('/revenue/store', [RevenueController::class, 'store'])
+            ->name('revenue.store');
 
         // Dispatch
         Route::get('/dispatch', [DispatchController::class, 'index'])
@@ -91,10 +97,15 @@ Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
 
         Route::delete('/dispatch/delete/{dispatch}', [DispatchController::class, 'destroy'])
             ->name('dispatch.destroy');
+
+             Route::get('/owner/users', [UserController::class, 'index'])
+        ->name('owner.users');
     });
+
+
 /*
 |--------------------------------------------------------------------------
-| STAFF / CURRENT SYSTEM ROUTES
+| STAFF ROUTES
 |--------------------------------------------------------------------------
 */
 
@@ -118,17 +129,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])
         ->name('inventory');
 
-    // Forecast
-    Route::view('/forecast', 'forecast')
-        ->name('forecast');
+    Route::post('/inventory/store', [InventoryController::class, 'store'])
+        ->name('inventory.store');
 
-    // Revenue
-    Route::view('/revenue', 'revenue')
-        ->name('revenue');
+    Route::post('/inventory/update/{id}', [InventoryController::class, 'update'])
+        ->name('inventory.update');
 
-    // Users
-    Route::view('/users', 'users')
-        ->name('users');
+    Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
+        ->name('inventory.destroy');
 
     // QR Scanner
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
@@ -154,31 +162,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
 
-    // Inventory
-    Route::post('/inventory/store', [InventoryController::class, 'store'])
-        ->name('inventory.store');
-
-    Route::post('/inventory/update/{id}', [InventoryController::class, 'update'])
-        ->name('inventory.update');
-
-    Route::delete('/inventory/delete/{id}', [InventoryController::class, 'destroy'])
-        ->name('inventory.destroy');
-
-    // Dispatch
-    Route::get('/dispatch', [DispatchController::class, 'index'])
-        ->name('dispatch');
-
-    Route::post('/dispatch/store', [DispatchController::class, 'store'])
-        ->name('dispatch.store');
-
-    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])
-        ->name('dispatch.update');
-
-    Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
-        ->name('dispatch.destroy');
-
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
-
 });

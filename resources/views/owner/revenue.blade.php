@@ -1,226 +1,548 @@
 @extends('layouts.sidebar')
-
-@section('title', 'Users')
-@section('page-label', 'Users')
-
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('css/users.css') }}">
-@endpush
+@section('title', 'Revenue')
 
 @section('content')
-<div class="users-page">
 
-    <div class="page-header">
-        <h1>User Management</h1>
-        <button class="btn-primary" onclick="openAddModal()">+ Add User</button>
-    </div>
+    <div class="revenue-page">
+        <h3 class="page-title mb-4">
+            Revenue Overview
+        </h3>
 
-    <!-- ROLE FILTER PILLS -->
-    <div class="role-pills">
-        <a href="{{ route('owner.users') }}" class="pill {{ !$role ? 'active' : '' }}">All Roles</a>
-        <a href="{{ route('owner.users', ['role' => 'owner']) }}" class="pill {{ $role === 'owner' ? 'active' : '' }}">Farm Owner</a>
-        <a href="{{ route('owner.users', ['role' => 'manager']) }}" class="pill {{ $role === 'manager' ? 'active' : '' }}">Farm Manager</a>
-        <a href="{{ route('owner.users', ['role' => 'staff']) }}" class="pill {{ $role === 'staff' ? 'active' : '' }}">Farm Worker</a>
-    </div>
+        <!-- SUMMARY CARDS -->
 
-    <!-- SEARCH + STATUS -->
-    <form method="GET" class="search-bar">
-        <input type="hidden" name="role" value="{{ $role }}">
-        <input type="text" name="search" placeholder="Search name or username..." value="{{ $search }}" onchange="this.form.submit()">
+        <div class="row g-4 mb-4">
 
-        <select name="status" onchange="this.form.submit()">
-            <option value="">All Status</option>
-            <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
-            <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Inactive</option>
-        </select>
-    </form>
+            <div class="col-lg-3 col-md-6">
 
-    <div class="user-count">{{ $users->total() }} users</div>
+                <div class="summary-card">
 
-    <!-- USER TABLE -->
-    <div class="user-table-wrapper">
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Last Active</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $avatarColors = ['#e74c3c','#8e44ad','#e67e22','#27ae60','#2980b9','#16a085','#d35400'];
-                    $roleLabels = ['owner' => 'Farm Owner', 'manager' => 'Farm Manager', 'staff' => 'Farm Worker'];
-                @endphp
+                    <span class="summary-label">
+                        TODAY
+                    </span>
 
-                @forelse($users as $user)
-                @php
-                    $initials = collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w,0,1)))->take(2)->implode('');
-                    $colorIndex = array_sum(array_map('ord', str_split($user->name))) % count($avatarColors);
-                    $avatarColor = $avatarColors[$colorIndex];
-                @endphp
-                <tr>
-                    <td>
-                        <div class="user-cell">
-                            <div class="avatar" style="background: {{ $avatarColor }}">{{ $initials }}</div>
-                            <div class="user-info">
-                                <strong>{{ $user->name }}</strong>
-                                <span class="user-sub">{{ $user->username }} · {{ $user->email }}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="role-badge">{{ $roleLabels[$user->role] ?? $user->role }}</span>
-                    </td>
-                    <td>
-                        <span class="status-dot status-{{ $user->status }}">
-                            <i class="fas fa-circle"></i> {{ ucfirst($user->status) }}
-                        </span>
-                    </td>
-                    <td>
-                        {{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->diffForHumans() : 'Never' }}
-                    </td>
-                    <td class="actions-cell">
-                        <a href="#" class="action-link"
-                           onclick="openEditModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->username }}', '{{ $user->email }}', '{{ $user->role }}'); return false;">
-                            Edit
-                        </a>
+                    <h2>
+                        ₱{{ number_format($todayRevenue ?? 0, 2) }}
+                    </h2>
 
-                        <form action="{{ route('owner.users.toggleStatus', $user->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="action-link {{ $user->status === 'active' ? 'text-danger' : 'text-success' }}">
-                                {{ $user->status === 'active' ? 'Deactivate' : 'Reactivate' }}
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">No users found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-        </table>
+                    <small>
+                        Today's Total
+                    </small>
 
-        <div class="pagination-bar">
-            {{ $users->links() }}
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="summary-card">
+
+                    <span class="summary-label">
+                        THIS WEEK
+                    </span>
+
+                    <h2>
+                        ₱{{ number_format($weekRevenue ?? 0, 2) }}
+                    </h2>
+
+                    <small>
+                        7-day Total
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="summary-card">
+
+                    <span class="summary-label">
+                        THIS MONTH
+                    </span>
+
+                    <h2>
+                        ₱{{ number_format($monthRevenue ?? 0, 2) }}
+                    </h2>
+
+                    <small>
+                        Monthly Revenue
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="summary-card warning">
+
+                    <span class="summary-label">
+                        PENDING
+                    </span>
+
+                    <h2>
+                        ₱{{ number_format($pendingRevenue ?? 0, 2) }}
+                    </h2>
+
+                    <small>
+                        Awaiting Payment
+                    </small>
+
+                </div>
+
+            </div>
+
         </div>
-    </div>
-    </div>
 
-</div>
+        <!-- CHART + FORM -->
 
-<!-- ADD USER MODAL -->
-<div class="modal-overlay" id="addModal">
-    <div class="modal-box">
-        <h3>Add User</h3>
-        <form action="{{ route('owner.users.store') }}" method="POST">
-            @csrf
+        <div class="row g-4 mb-4">
 
-            <label>Full Name</label>
-            <input type="text" name="name" required>
+            <!-- CHART -->
 
-            <label>Username</label>
-            <input type="text" name="username" required>
+            <div class="col-lg-7">
 
-            <label>Email</label>
-            <input type="email" name="email" required>
+                <div class="revenue-card chart-card">
 
-            <label>Password</label>
-            <input type="password" name="password" required>
+                    <h5 class="card-title mb-4">
+                        Weekly Revenue
+                    </h5>
+                    <canvas id="revenueChart" height="140"></canvas>
 
-            <label>Role</label>
-            <select name="role" required>
-                <option value="owner">Farm Owner</option>
-                <option value="manager">Farm Manager</option>
-                <option value="staff">Farm Worker</option>
-            </select>
+                </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save</button>
             </div>
-        </form>
-    </div>
-</div>
 
-<!-- EDIT USER MODAL -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-        <h3>Edit User</h3>
-        <form id="editForm" method="POST">
-            @csrf
-            @method('PUT')
+            <!-- FORM -->
 
-            <label>Full Name</label>
-            <input type="text" name="name" id="editName" required>
+            <div class="col-lg-5">
 
-            <label>Username</label>
-            <input type="text" name="username" id="editUsername" required>
+                <div class="revenue-card">
 
-            <label>Email</label>
-            <input type="email" name="email" id="editEmail" required>
+                    <h6 class="form-title mb-4">
 
-            <label>New Password (leave blank to keep current)</label>
-            <input type="password" name="password">
+                        RECORD NEW REVENUE
 
-            <label>Role</label>
-            <select name="role" id="editRole" required>
-                <option value="owner">Farm Owner</option>
-                <option value="manager">Farm Manager</option>
-                <option value="staff">Farm Worker</option>
-            </select>
+                    </h6>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save Changes</button>
+                    <form method="POST" action="{{ route('owner.revenue.store') }}">
+
+                        @csrf
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Customer
+
+                            </label>
+
+                            <input type="text" name="customer_name" class="form-control" placeholder="Customer Name"
+                                required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Dispatch
+
+                            </label>
+
+                            <select name="dispatch_id" class="form-select">
+
+                                <option value="">
+
+                                    Select Dispatch
+
+                                </option>
+
+                                @foreach($dispatches ?? [] as $dispatch)
+
+                                    <option value="{{ $dispatch->dispatch_id }}">
+
+                                        Dispatch #{{ $dispatch->dispatch_id }}
+
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Date
+
+                            </label>
+
+                            <input type="date" name="transaction_date" class="form-control" value="{{ date('Y-m-d') }}">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Payment Status
+
+                            </label>
+
+                            <select class="form-select" name="status">
+
+                                <option>
+
+                                    Paid
+
+                                </option>
+
+                                <option>
+
+                                    Pending
+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="total-box">
+
+                            <span>
+
+                                Total Amount
+
+                            </span>
+
+                            <strong>
+
+                                ₱0.00
+
+                            </strong>
+
+                        </div>
+
+                        <button class="btn-save mt-4">
+
+                            Save Revenue
+
+                        </button>
+
+                    </form>
+
+                </div>
+
             </div>
-        </form>
-    </div>
-</div>
 
+        </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="revenue-card">
+
+            <div class="transactions-header">
+
+                <h5>
+                    Transactions
+                </h5>
+
+                <div class="transactions-tools">
+
+                    <input type="text" class="search-box" placeholder="Search customer...">
+
+                    <select class="sort-box">
+
+                        <option>
+                            Newest First
+                        </option>
+
+                        <option>
+                            Oldest First
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table revenue-table align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Customer</th>
+
+                            <th>Dispatch</th>
+
+                            <th>Total</th>
+
+                            <th>Date</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($revenues ?? [] as $revenue)
+
+                            <tr>
+
+                                <td>
+
+                                    {{ $revenue->customer_name }}
+
+                                </td>
+
+                                <td>
+
+                                    #{{ $revenue->dispatch_id }}
+
+                                </td>
+
+                                <td>
+
+                                    ₱{{ number_format($revenue->total_amount, 2) }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ \Carbon\Carbon::parse($revenue->transaction_date)->format('M d, Y') }}
+
+                                </td>
+
+                                <td>
+
+                                    @if(($revenue->status ?? 'Paid') == 'Paid')
+
+                                        <span class="badge bg-success">
+
+                                            Paid
+
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge bg-warning text-dark">
+
+                                            Pending
+
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="5" class="text-center text-muted py-5">
+
+                                    No Revenue Records Found
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="pagination-area">
+
+                Showing Revenue Records
+
+            </div>
+
+        </div>
+
+    </div>
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/revenue.css') }}">
+    @endpush
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-function openAddModal() {
-    document.getElementById('addModal').classList.add('active');
-}
-function closeAddModal() {
-    document.getElementById('addModal').classList.remove('active');
-}
 
-function openEditModal(id, name, username, email, role) {
-    document.getElementById('editForm').action = `/owner/users/${id}`;
-    document.getElementById('editName').value = name;
-    document.getElementById('editUsername').value = username;
-    document.getElementById('editEmail').value = email;
-    document.getElementById('editRole').value = role;
-    document.getElementById('editModal').classList.add('active');
-}
-function closeEditModal() {
-    document.getElementById('editModal').classList.remove('active');
-}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-document.getElementById('addModal').addEventListener('click', function(e) {
-    if (e.target === this) closeAddModal();
-});
-document.getElementById('editModal').addEventListener('click', function(e) {
-    if (e.target === this) closeEditModal();
-});
+    <script>
 
-@if(session('success'))
-Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: @json(session('success')),
-    confirmButtonColor: '#2E7D32',
-    timer: 2000,
-    timerProgressBar: true,
-});
-@endif
-</script>
+        const ctx = document.getElementById('revenueChart');
+
+        if (ctx) {
+
+            new Chart(ctx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+
+                    datasets: [{
+
+                        label: 'Revenue',
+
+                        data: [1200, 1500, 1800, 1600, 2400, 2100, 2800],
+
+                        borderColor: '#2E7D32',
+
+                        backgroundColor: 'rgba(46,125,50,.12)',
+
+                        fill: true,
+
+                        tension: .4
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    </script>
+    
+
+    <script>
+
+        const ctx = document.getElementById('revenueChart');
+
+        if (ctx) {
+
+
+            const gradient = context.createLinearGradient(0, 0, 0, 350);
+
+            gradient.addColorStop(0, 'rgba(46,125,50,.35)');
+            gradient.addColorStop(1, 'rgba(46,125,50,0)');
+
+            new Chart(context, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: @json(collect($chartData)->pluck('day')),
+
+                    datasets: [{
+
+                        label: 'Revenue',
+
+                        data: @json(collect($chartData)->pluck('amount')),
+
+                        borderColor: '#2E7D32',
+
+                        backgroundColor: gradient,
+
+                        fill: true,
+
+                        tension: .4,
+
+                        pointRadius: 5,
+
+                        pointHoverRadius: 7,
+
+                        pointBackgroundColor: '#2E7D32',
+
+                        pointBorderColor: '#fff',
+
+                        pointBorderWidth: 2,
+
+                        borderWidth: 3
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6b7280'
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#eef2f7'
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                callback: function (value) {
+                                    return '₱' + value.toLocaleString();
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    </script>
 @endpush

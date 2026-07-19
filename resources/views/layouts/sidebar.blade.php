@@ -40,7 +40,7 @@
 
         if ($role === 'farm owner') {
             $role = 'owner';
-            
+
         }
 
         $roleLabels = [
@@ -75,14 +75,26 @@
                     : 'inventory',
                 'roles' => ['owner', 'manager', 'staff'],
             ],
-           [
-    'label' => 'Dispatch',
-    'icon' => 'fas fa-truck',
-    'route' => $role === 'owner'
-        ? 'owner.dispatch'
-        : 'dispatch',
-    'roles' => ['owner', 'manager'],
-],
+            [
+                'label' => 'Dispatch',
+                'icon' => 'fas fa-truck',
+                'route' => $role === 'owner'
+                    ? 'owner.dispatch'
+                    : 'dispatch',
+                'roles' => ['owner', 'manager'],
+            ],
+            [
+                'label' => 'Revenue',
+                'icon' => 'fas fa-money-bill-wave',
+                'route' => 'owner.revenue',
+                'roles' => ['owner'],
+            ],
+            [
+                'label' => 'User Management',
+                'icon' => 'fas fa-users',
+                'route' => 'owner.users',
+                'roles' => ['owner'],
+            ],
         ];
 
     @endphp
@@ -102,23 +114,23 @@
             </div>
 
             <nav>
-    <ul>
-        @foreach ($menuItems as $item)
+                <ul>
+                    @foreach ($menuItems as $item)
 
-            @if(in_array($role, $item['roles']))
+                        @if(in_array($role, $item['roles']))
 
-                <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
-                    <a href="{{ route($item['route']) }}">
-                        <i class="{{ $item['icon'] }}"></i>
-                        {{ $item['label'] }}
-                    </a>
-                </li>
+                            <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
+                                <a href="{{ route($item['route']) }}">
+                                    <i class="{{ $item['icon'] }}"></i>
+                                    {{ $item['label'] }}
+                                </a>
+                            </li>
 
-            @endif
+                        @endif
 
-        @endforeach
-    </ul>
-</nav>
+                    @endforeach
+                </ul>
+            </nav>
 
             <form action="{{ route('logout') }}" method="POST" class="logout">
                 @csrf

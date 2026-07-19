@@ -7,6 +7,7 @@ use App\Models\QrRecord;
 use App\Models\QrTransaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Forecast;
 
 class ProductionController extends Controller
 {
@@ -47,6 +48,9 @@ class ProductionController extends Controller
 
         $totalEggs = $productions->sum('eggs_produced');
 
+        $predictedEggs = Forecast::latest('forecast_date')
+    ->value('predicted_eggs') ?? 0;
+
         // Fetch QR transactions related to the selected productions
         $productionIds = $productions->pluck('production_id');
 
@@ -55,25 +59,26 @@ class ProductionController extends Controller
     ->get();
 
             $selectedDate = $date;
-$viewType = $view;
+        $viewType = $view;
 
-if (request()->routeIs('owner.*')) {
-    return view('owner.production', compact(
-        'productions',
-        'totalEggs',
-        'qrTransactions',
-        'selectedDate',
-        'viewType'
-    ));
-}
+        if (request()->routeIs('owner.*')) {
+            return view('owner.production', compact(
+                'productions',
+                'totalEggs',
+                'predictedEggs',
+                'qrTransactions',
+                'selectedDate',
+                'viewType'
+            ));
+        }
 
-return view('production', compact(
-    'productions',
-    'totalEggs',
-    'qrTransactions',
-    'selectedDate',
-    'viewType'
-));
-
-}
+        return view('production', compact(
+            'productions',
+            'totalEggs',
+            'predictedEggs',
+            'qrTransactions',
+            'selectedDate',
+            'viewType'
+        ));
+    }
 }

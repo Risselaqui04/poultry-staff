@@ -6,6 +6,7 @@ use App\Models\Production;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\DB;
 use App\Models\DailyInventoryLog;
+use App\Models\Forecast;
 
 class DashboardController extends Controller
 {
@@ -76,12 +77,17 @@ if (!DailyInventoryLog::where('log_date', $today)->exists()) {
     ->orderBy('production_date')
     ->get();
 
+    $forecast = Forecast::latest('forecast_date')->first();
+
+$predictedEggs = $forecast?->predicted_eggs ?? 0; 
+
     return view('dashboardview', compact(
-        'todayProduction',
-        'activeBatches',
-        'feeds',
-        'eggTrays',
-        'weeklyProduction'
-    ));
+    'todayProduction',
+    'activeBatches',
+    'feeds',
+    'eggTrays',
+    'weeklyProduction',
+    'predictedEggs'
+));
 }
 }
